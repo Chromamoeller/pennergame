@@ -28,12 +28,20 @@ def save_player(player_data):
         json.dump(player_data, file, indent=4)
 
 # **Neue Funktion zum Aktualisieren der UI nach dem Laden des Spielers**
-def update_ui(player, player_curency_value_label,player_deposit_bottle):
+def update_ui(player, player_curency_value_label,player_deposit_bottle, player_name_value_label,
+           player_hunger_value_label, player_weapon_value_label, player_energy_value_label, player_strength_value_label):
     player_curency_value_label.config(text=f"{player.currency} €")
     player_deposit_bottle.config(text=f"{player.deposit_bottle}")
+    player_name_value_label.config(text=f"{player.name}")
+    player_hunger_value_label.config(text=f"{player.hunger}")
+    player_weapon_value_label.config(text=f"{player.weapon}")
+    player_energy_value_label.config(text=f"{player.energy}")
+    player_strength_value_label.config(text=f"{player.strength}")
+
 
 # Funktion zum Öffnen des Login-Fensters
-def open_popup(root, player, top_frame, player_curency_value_label, player_bottle_value_label):
+def open_popup(root, player, top_frame, player_curency_value_label, player_bottle_value_label, player_name_value_label,
+           player_hunger_value_label, player_weapon_value_label, player_energy_value_label, player_strength_value_label):
     popup = tk.Toplevel(root)
     popup.title("Login")
     popup.attributes("-topmost", True)
@@ -82,7 +90,8 @@ def open_popup(root, player, top_frame, player_curency_value_label, player_bottl
                 popup.destroy()  # Fenster schließen
 
                 # **Ruft update_ui() auf, um die Anzeige zu aktualisieren**
-                update_ui(player, player_curency_value_label,player_bottle_value_label)
+                update_ui(player, player_curency_value_label,player_bottle_value_label, player_name_value_label,
+           player_hunger_value_label, player_weapon_value_label, player_energy_value_label, player_strength_value_label)
 
                 player_name_label = tk.Label(top_frame, text=f"Eingeloggt als: {player.name}", font=("Arial", 14))
                 player_name_label.pack(pady=20)

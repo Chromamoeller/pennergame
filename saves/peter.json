@@ -1,0 +1,10 @@
+{
+    "name": "peter",
+    "currency": 5,
+    "strength": 20,
+    "energy": 10,
+    "hunger": 10,
+    "weapon": "Schlagring",
+    "deposit_bottle": 0,
+    "status": "Obdachlos"
+}

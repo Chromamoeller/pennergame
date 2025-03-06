@@ -2,18 +2,30 @@ import tkinter as tk
 import json
 import os
 
+json_datei = "users.json"
+
+
 # Funktion zum Laden der Benutzerdaten aus einer JSON-Datei
 def load_users():
+    if not os.path.exists("users.json"):  # Falls die Datei nicht existiert
+        return {}  # Gebe ein leeres Dictionary zurück
+
     try:
         with open("users.json", "r") as file:
-            return json.load(file)
-    except FileNotFoundError:
-        return {}  # Falls Datei nicht existiert, leere Liste zurückgeben
+            data = file.read().strip()  # Strip entfernt Leerzeichen oder neue Zeilen
+            if not data:  # Falls die Datei leer ist
+                return {}
+            return json.loads(data)  # JSON-Daten parsen
+    except (json.JSONDecodeError, ValueError):  # Fehler beim Parsen der JSON-Datei
+        print("❌ Fehler: users.json ist beschädigt. Datei wird neu erstellt.")
+        return {}
 
-# Funktion zum Speichern der Benutzerdaten in der JSON-Datei
-def save_users(users):
-    with open("users.json", "w") as file:
-        json.dump(users, file, indent=4)
+
+def save_json(data):
+    with open(json_datei, "w") as file:
+        json.dump(data, file, indent=4)
+    print("erfolgreich gespeichert")
+
 
 # Funktion zum Laden eines gespeicherten Spielers
 def load_player(name):
@@ -23,67 +35,30 @@ def load_player(name):
             return json.load(file)
     return None  # Falls kein Speicherstand existiert
 
+
 # Funktion zum Speichern eines neuen Spielers
-def save_player(player_data):
-    os.makedirs("saves", exist_ok=True)  # Erstellt den Ordner "saves", falls nicht vorhanden
-    file_path = f"saves/{player_data['name']}.json"
-    with open(file_path, "w") as file:
-        json.dump(player_data, file, indent=4)
+def save_users(users):
+    with open("users.json", "w") as file:
+        json.dump(users, file, indent=4)
 
-# Funktion zum Öffnen des Registrierungsfensters
-def open_registration():
-    reg_popup = tk.Toplevel()
-    reg_popup.title("Registrierung")
-    reg_popup.geometry("300x250")
-    reg_popup.attributes("-topmost", True)
 
-    tk.Label(reg_popup, text="Neuer Username:").pack(pady=5)
-    new_username_entry = tk.Entry(reg_popup, font="Arial")
-    new_username_entry.pack(pady=5)
+# **Neue Funktion zum Aktualisieren der UI nach dem Laden des Spielers**
+def update_ui(player, player_curency_value_label, player_deposit_bottle, player_name_value_label,
+              player_hunger_value_label, player_weapon_value_label, player_energy_value_label,
+              player_strength_value_label):
+    player_curency_value_label.config(text=f"{player.currency} €")
+    player_deposit_bottle.config(text=f"{player.deposit_bottle}")
+    player_name_value_label.config(text=f"{player.name}")
+    player_hunger_value_label.config(text=f"{player.hunger}")
+    player_weapon_value_label.config(text=f"{player.weapon}")
+    player_energy_value_label.config(text=f"{player.energy}")
+    player_strength_value_label.config(text=f"{player.strength}")
 
-    tk.Label(reg_popup, text="Neues Passwort:").pack(pady=5)
-    new_password_entry = tk.Entry(reg_popup, show="*", font="Arial")
-    new_password_entry.pack(pady=5)
-
-    reg_error_label = tk.Label(reg_popup, text="", fg="red")
-    reg_error_label.pack(pady=5)
-
-    def register():
-        new_username = new_username_entry.get()
-        new_password = new_password_entry.get()
-
-        if not new_username or not new_password:
-            reg_error_label.config(text="❌ Alle Felder ausfüllen!")
-            return
-
-        users = load_users()
-
-        if new_username in users:
-            reg_error_label.config(text="❌ Benutzername existiert bereits!")
-        else:
-            users[new_username] = new_password
-            save_users(users)
-
-            # Standard-Spielstand für neuen Spieler speichern
-            new_player_data = {
-                "name": new_username,
-                "currency": 5,
-                "strength": 10,
-                "energy": 10,
-                "hunger": 5,
-                "weapon": None,
-                "deposit_bottle": 0,
-                "status": "Obdachlos"
-            }
-            save_player(new_player_data)
-
-            reg_error_label.config(text="✅ Account erstellt!", fg="green")
-            reg_popup.after(1000, reg_popup.destroy)  # Fenster nach 1 Sekunde schließen
-
-    tk.Button(reg_popup, text="Speichern", command=register).pack(pady=10)
 
 # Funktion zum Öffnen des Login-Fensters
-def open_popup(root, player, top_frame):
+def open_popup(root, player, player_curency_value_label, player_bottle_value_label, player_name_value_label,
+               player_hunger_value_label, player_weapon_value_label, player_energy_value_label,
+               player_strength_value_label):
     popup = tk.Toplevel(root)
     popup.title("Login")
     popup.attributes("-topmost", True)
@@ -116,7 +91,6 @@ def open_popup(root, player, top_frame):
         password = password_entry.get()
         users = load_users()
 
-        # Prüfen, ob Benutzername und Passwort korrekt sind
         if username in users and users[username] == password:
             saved_data = load_player(username)
             if saved_data:
@@ -131,8 +105,12 @@ def open_popup(root, player, top_frame):
                 player.status = saved_data["status"]
 
                 popup.destroy()  # Fenster schließen
-                player_name_label = tk.Label(top_frame, text=f"Eingeloggt als: {player.name}", font=("Arial", 14))
-                player_name_label.pack(pady=20)
+
+                # **Ruft update_ui() auf, um die Anzeige zu aktualisieren**
+                update_ui(player, player_curency_value_label, player_bottle_value_label, player_name_value_label,
+                          player_hunger_value_label, player_weapon_value_label, player_energy_value_label,
+                          player_strength_value_label)
+
             else:
                 error_label.config(text="❌ Kein Spielstand gefunden!")
         else:
@@ -143,4 +121,54 @@ def open_popup(root, player, top_frame):
     btn_frame.pack(pady=10)
 
     tk.Button(btn_frame, text="OK", command=submit).pack(side="left", padx=10)
-    tk.Button(btn_frame, text="Neuen Account erstellen", command=open_registration).pack(side="right", padx=10)
+    tk.Button(btn_frame, text="Account erstellen", command=open_window_new_account).pack(side="left", padx=10)
+
+
+def open_window_new_account():
+    popup = tk.Toplevel()
+    popup.title("Neuer Account")
+    popup.attributes("-topmost", True)
+    popup_width = 300
+    popup_height = 250
+    popup.geometry(f"{popup_width}x{popup_height}")
+
+    tk.Label(popup, text="Name").pack()
+    new_acc_name = tk.Entry(popup, font="Arial")
+    new_acc_name.pack(pady=10)
+    tk.Label(popup, text="Passwort").pack()
+    new_account_password = tk.Entry(popup, show="*", font="Arial")
+    new_account_password.pack(pady=10)
+
+    def add_user_to_list():
+        username = new_acc_name.get().strip()
+        password = new_account_password.get().strip()
+
+        if not username or not password:
+            print("❌ Benutzername und Passwort dürfen nicht leer sein!")
+            return
+
+        user_list = load_users()
+
+        if username in user_list:
+            print("❌ Benutzername existiert bereits!")
+        else:
+            user_list[username] = password
+            save_json(user_list)  # ✅ Korrektur: user_list speichern, nicht "list"
+            user_data_name = f"{new_acc_name.get()}"
+            user_data = {
+                "name": f"{new_acc_name.get()}",
+                "currency": 5,
+                "strength": 20,
+                "energy": 10,
+                "hunger": 10,
+                "weapon": "Schlagring",
+                "deposit_bottle": 0,
+                "status": "Obdachlos"
+            }
+
+            verzeichnis = f"./saves/{user_data_name}.json"
+            with open(verzeichnis, "w") as file:
+                json.dump(user_data, file, indent=4)
+            print("✅ Neuer Benutzer erfolgreich registriert!")
+
+    tk.Button(popup, text="Regestrieren", command=add_user_to_list).pack()

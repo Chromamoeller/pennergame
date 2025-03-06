@@ -1,0 +1,10 @@
+{
+    "name": "testuser",
+    "currency":42,
+    "strength": 20,
+    "energy": 5,
+    "hunger": 8,
+    "weapon": "Messer",
+    "deposit_bottle": 0,
+    "status": "Obdachlos"
+}

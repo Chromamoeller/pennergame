@@ -1,0 +1,10 @@
+{
+    "name": "admin",
+    "currency": 100,
+    "strength": 20,
+    "energy": 5,
+    "hunger": 8,
+    "weapon": "Messer",
+    "deposit_bottle": 15,
+    "status": "Obdachlos"
+}

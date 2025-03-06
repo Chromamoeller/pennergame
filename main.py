@@ -36,6 +36,6 @@ bottom_frame.pack(fill="x")
 
 btn = tk.Button(bottom_frame, text="Arbeiten", command=lambda: get_money(player_main,player_curency_value_label))
 btn.pack(pady=10)
-open_popup(root, player_main, top_frame)
+open_popup(root, player_main, top_frame, player_curency_value_label)
 
 root.mainloop()

@@ -10,10 +10,7 @@ def load_users():
     except FileNotFoundError:
         return {}  # Falls Datei nicht existiert, leere Liste zurückgeben
 
-# Funktion zum Speichern der Benutzerdaten in der JSON-Datei
-def save_users(users):
-    with open("users.json", "w") as file:
-        json.dump(users, file, indent=4)
+
 
 # Funktion zum Laden eines gespeicherten Spielers
 def load_player(name):
@@ -30,60 +27,12 @@ def save_player(player_data):
     with open(file_path, "w") as file:
         json.dump(player_data, file, indent=4)
 
-# Funktion zum Öffnen des Registrierungsfensters
-def open_registration():
-    reg_popup = tk.Toplevel()
-    reg_popup.title("Registrierung")
-    reg_popup.geometry("300x250")
-    reg_popup.attributes("-topmost", True)
-
-    tk.Label(reg_popup, text="Neuer Username:").pack(pady=5)
-    new_username_entry = tk.Entry(reg_popup, font="Arial")
-    new_username_entry.pack(pady=5)
-
-    tk.Label(reg_popup, text="Neues Passwort:").pack(pady=5)
-    new_password_entry = tk.Entry(reg_popup, show="*", font="Arial")
-    new_password_entry.pack(pady=5)
-
-    reg_error_label = tk.Label(reg_popup, text="", fg="red")
-    reg_error_label.pack(pady=5)
-
-    def register():
-        new_username = new_username_entry.get()
-        new_password = new_password_entry.get()
-
-        if not new_username or not new_password:
-            reg_error_label.config(text="❌ Alle Felder ausfüllen!")
-            return
-
-        users = load_users()
-
-        if new_username in users:
-            reg_error_label.config(text="❌ Benutzername existiert bereits!")
-        else:
-            users[new_username] = new_password
-            save_users(users)
-
-            # Standard-Spielstand für neuen Spieler speichern
-            new_player_data = {
-                "name": new_username,
-                "currency": 5,
-                "strength": 10,
-                "energy": 10,
-                "hunger": 5,
-                "weapon": None,
-                "deposit_bottle": 0,
-                "status": "Obdachlos"
-            }
-            save_player(new_player_data)
-
-            reg_error_label.config(text="✅ Account erstellt!", fg="green")
-            reg_popup.after(1000, reg_popup.destroy)  # Fenster nach 1 Sekunde schließen
-
-    tk.Button(reg_popup, text="Speichern", command=register).pack(pady=10)
+# **Neue Funktion zum Aktualisieren der UI nach dem Laden des Spielers**
+def update_ui(player, player_curency_value_label):
+    player_curency_value_label.config(text=f"{player.currency} €")
 
 # Funktion zum Öffnen des Login-Fensters
-def open_popup(root, player, top_frame):
+def open_popup(root, player, top_frame, player_curency_value_label):
     popup = tk.Toplevel(root)
     popup.title("Login")
     popup.attributes("-topmost", True)
@@ -116,7 +65,6 @@ def open_popup(root, player, top_frame):
         password = password_entry.get()
         users = load_users()
 
-        # Prüfen, ob Benutzername und Passwort korrekt sind
         if username in users and users[username] == password:
             saved_data = load_player(username)
             if saved_data:
@@ -131,6 +79,10 @@ def open_popup(root, player, top_frame):
                 player.status = saved_data["status"]
 
                 popup.destroy()  # Fenster schließen
+
+                # **Ruft update_ui() auf, um die Anzeige zu aktualisieren**
+                update_ui(player, player_curency_value_label)
+
                 player_name_label = tk.Label(top_frame, text=f"Eingeloggt als: {player.name}", font=("Arial", 14))
                 player_name_label.pack(pady=20)
             else:
@@ -143,4 +95,3 @@ def open_popup(root, player, top_frame):
     btn_frame.pack(pady=10)
 
     tk.Button(btn_frame, text="OK", command=submit).pack(side="left", padx=10)
-    tk.Button(btn_frame, text="Neuen Account erstellen", command=open_registration).pack(side="right", padx=10)

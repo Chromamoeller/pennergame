@@ -28,11 +28,12 @@ def save_player(player_data):
         json.dump(player_data, file, indent=4)
 
 # **Neue Funktion zum Aktualisieren der UI nach dem Laden des Spielers**
-def update_ui(player, player_curency_value_label):
+def update_ui(player, player_curency_value_label,player_deposit_bottle):
     player_curency_value_label.config(text=f"{player.currency} €")
+    player_deposit_bottle.config(text=f"{player.deposit_bottle}")
 
 # Funktion zum Öffnen des Login-Fensters
-def open_popup(root, player, top_frame, player_curency_value_label):
+def open_popup(root, player, top_frame, player_curency_value_label, player_bottle_value_label):
     popup = tk.Toplevel(root)
     popup.title("Login")
     popup.attributes("-topmost", True)
@@ -81,7 +82,7 @@ def open_popup(root, player, top_frame, player_curency_value_label):
                 popup.destroy()  # Fenster schließen
 
                 # **Ruft update_ui() auf, um die Anzeige zu aktualisieren**
-                update_ui(player, player_curency_value_label)
+                update_ui(player, player_curency_value_label,player_bottle_value_label)
 
                 player_name_label = tk.Label(top_frame, text=f"Eingeloggt als: {player.name}", font=("Arial", 14))
                 player_name_label.pack(pady=20)
@@ -95,3 +96,4 @@ def open_popup(root, player, top_frame, player_curency_value_label):
     btn_frame.pack(pady=10)
 
     tk.Button(btn_frame, text="OK", command=submit).pack(side="left", padx=10)
+    tk.Button(btn_frame, text="Account erstellen").pack(side="left", padx=10)

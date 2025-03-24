@@ -69,6 +69,8 @@ bottom_frame.pack(fill="x")
 working_btn = tk.Button(bottom_frame, text="Arbeiten",
                         command=lambda: get_money(player_main, player_curency_value_label))
 working_btn.pack(pady=10)
+save_btn = (tk.Button(bottom_frame, text="Speichern", command=lambda :player_main.save_player()))
+save_btn.pack(side="left")
 open_popup(root, player_main, player_curency_value_label, player_bottle_value_label, player_name_value_label,
            player_hunger_value_label, player_weapon_value_label, player_energy_value_label, player_strength_value_label)
 
